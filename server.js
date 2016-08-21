@@ -2,6 +2,7 @@
 var restify = require('restify');
 var Promise = require('bluebird');
 var bunyan = require('bunyan');
+var chance = new (require('chance'))();
 var restifyBunyanLogger = require('restify-bunyan-logger');
 Promise.promisifyAll(restify.JsonClient.prototype, {multiArgs: true});
 
@@ -9,6 +10,7 @@ Promise.promisifyAll(restify.JsonClient.prototype, {multiArgs: true});
 var appName = require('./package.json').name;
 var appVersion = require('./package.json').version;
 var appAuthor = require('./package.json').author;
+var adjectives = require('./data/Adjectives');
 var UPDATE_LOOP_TIME = 600000; // ms
 var log = bunyan.createLogger({
   name: appName,
@@ -16,7 +18,6 @@ var log = bunyan.createLogger({
   level: 'debug',
   serializers: {
     req: bunyan.stdSerializers.req
-    //res: restify.bunyan.serializers.response,
   }
 });
 
@@ -48,6 +49,10 @@ server.use(restify.queryParser());
 server.use(restify.bodyParser());
 server.on('after', restifyBunyanLogger());
 
+server.get('/', (req, res, next) => {
+  res.send({app: appName, version: appVersion, message: "Welcome to the Bravify API! For more information, please visit https://github.com/Bravify/Bravify-API."});
+});
+
 server.get('/version/:tag', (req, res, next) => {
   switch(req.params.tag) {
     case 'riot':
@@ -61,6 +66,24 @@ server.get('/version/:tag', (req, res, next) => {
       res.send({name: appName, version: appVersion, author: appAuthor});
       break;
   }
+  return next();
+});
+
+server.get('/champion/full/:name', (req, res, next) => {
+  if(!req.params.name) {
+    res.send(riotData.fullChampion || {});
+  } else {
+    if(riotData.fullChampion[req.params.name]) {
+      res.send(riotData.fullChampion[req.params.name]);
+    } else {
+      res.send({});
+    }
+  }
+  return next();
+});
+
+server.get('/champion/full', (req, res, next) => {
+  res.send(riotData.fullChampion || {});
   return next();
 });
 
@@ -79,24 +102,6 @@ server.get('/champion/:name', (req, res, next) => {
 
 server.get('/champion', (req, res, next) => {
   res.send(riotData.champion.data || {});
-  return next();
-});
-
-server.get('/fullchampion/:name', (req, res, next) => {
-  if(!req.params.name) {
-    res.send(riotData.fullChampion || {});
-  } else {
-    if(riotData.fullChampion[req.params.name]) {
-      res.send(riotData.fullChampion[req.params.name]);
-    } else {
-      res.send({});
-    }
-  }
-  return next();
-});
-
-server.get('/fullchampion', (req, res, next) => {
-  res.send(riotData.fullChampion || {});
   return next();
 });
 
@@ -133,6 +138,21 @@ server.get('/spell/:name', (req, res, next) => {
 
 server.get('/spell', (req, res, next) => {
   res.send(riotData.spell.data || {});
+  return next();
+});
+
+server.get('/adjective/random', (req, res, next) => {
+  res.send({adjective: chance.pickone(adjectives) || null});
+  return next();
+});
+
+server.get('/adjective/:id', (req, res, next) => {
+  res.send({adjective: adjectives[req.params.id] || null});
+  return next();
+});
+
+server.get('/adjective', (req, res, next) => {
+  res.send(adjectives || {});
   return next();
 });
 
