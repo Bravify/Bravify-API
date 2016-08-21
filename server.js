@@ -27,7 +27,9 @@ var riotData = {
   fullChampion: {},
   item: {},
   spell: {},
-  version: {}
+  version: {},
+  language: [],
+  langData: {}
 }
 
 // Client used to gather data from Riot.
@@ -51,6 +53,7 @@ server.on('after', restifyBunyanLogger());
 
 server.get('/', (req, res, next) => {
   res.send({app: appName, version: appVersion, message: "Welcome to the Bravify API! For more information, please visit https://github.com/Bravify/Bravify-API."});
+  return next();
 });
 
 server.get('/version/:tag', (req, res, next) => {
@@ -156,6 +159,16 @@ server.get('/adjective', (req, res, next) => {
   return next();
 });
 
+server.get('/language/:lang', (req, res, next) => {
+  res.send(riotData.langData[req.params.lang] || null);
+  return next();
+});
+
+server.get('/language', (req, res, next) => {
+  res.send(riotData.language || ['en_US']); // language data can have a safe default.
+  return next();
+});
+
 server.listen(8080, function () {
   log.info('%s listening at %s', server.name, server.url);
   updateLoop(); // kick off the update loop.
@@ -204,6 +217,23 @@ function getDataFromRiotDDragon() {
     DDragonClient.getAsync(`/cdn/${o.v}/data/${o.l}/item.json`).spread((req, res, obj) => {
       log.debug(`Successfully downloaded cdn/${o.v}/data/${o.l}/item.json.`);
       riotData.item = obj;
+    });
+    return o;
+  }).then(o => {
+    log.debug(`Downloading cdn/languages.json`);
+    DDragonClient.getAsync(`/cdn/languages.json`).spread((req, res, obj) => {
+      log.debug(`Successfully downloaded cdn/languages.json`);
+      riotData.language = obj;
+      return {v: o.v, d: obj};
+    }).then(o => {
+      log.debug(`Downloading language data.`);
+      o.d.forEach(l => {
+        log.debug(`Downloading cdn/${o.v}/data/${l}/language.json`);
+        DDragonClient.getAsync(`/cdn/${o.v}/data/${l}/language.json`).spread((req, res, obj) => {
+          log.debug(`Successfully downloaded cdn/${o.v}/data/${l}/language.json`);
+          riotData.langData[l] = obj;
+        });
+      });
     });
     return o;
   }).catch(e => {
