@@ -16,7 +16,7 @@ var appName = require('./package.json').name;
 var appVersion = require('./package.json').version;
 var appAuthor = require('./package.json').author;
 var adjectives = require('./data/Adjectives');
-var UPDATE_LOOP_TIME = 10000; // ms
+var UPDATE_LOOP_TIME = 60000; // ms
 var log = bunyan.createLogger({
   name: appName,
   level: 'debug',
@@ -35,9 +35,6 @@ var riotData = {
   language: [],
   langData: {}
 }
-
-// Used to keep track of downloading status.
-var downloading = false;
 
 // Client used to gather data from Riot.
 var DDragonClient = restify.createJsonClient({
@@ -259,16 +256,13 @@ function clearCache() {
 
 function updateLoop() {
   log.debug('Starting update loop.');
-  if(!downloading) {
-    getDataFromRiotDDragon();
-  }
+  getDataFromRiotDDragonOrCache();
   setTimeout(updateLoop, UPDATE_LOOP_TIME);
 }
 
-function getDataFromRiotDDragon() {
+function getDataFromRiotDDragonOrCache() {
   // download the realms JSON for version data.
   log.debug('Downloading realms/na.json');
-  downloading = true;
   DDragonClient.getAsync('/realms/na.json').spread((req, res, obj) => {
     log.debug('Successfully downloaded realms/na.json.');
     var cacheValid = true; // assume we have a good cache and aren't on our initial load.
@@ -409,7 +403,5 @@ function getDataFromRiotDDragon() {
     return o;
   }).catch(e => {
     log.error(e, 'Error when downloading data from DDragon!');
-  }).finally(() => {
-    downloading = false;
   });
 }
