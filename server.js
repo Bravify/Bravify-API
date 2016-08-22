@@ -312,7 +312,7 @@ function getDataFromRiotDDragonOrCache() {
         log.debug({code: e.code}, `Unable to load ${l}/champion.json from cache. Downloading from DDragon.`);
         return DDragonClient.getAsync(`/cdn/${o.v}/data/${l}/champion.json`).spread((req, res, obj) => {
           log.debug(`Successfully downloaded cdn/${o.v}/data/${l}/champion.json.`);
-          riotData.champion = obj;
+          riotData.champion[l] = obj;
           saveToCache(obj, `${l}/champion`, o.v);
           return obj.data;
         });
