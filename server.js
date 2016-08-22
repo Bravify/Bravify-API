@@ -235,11 +235,7 @@ function saveToCache(data, name, version) {
   var filePath = path.resolve('cache', version, `${name}`);
   mkdir(path.dirname(filePath), e => {
     if(e) { log.error(e, `couldn't create folder ${path.dirname(filePath)}. expect terrible things ahead!`); }
-    fs.writeFileAsync(filePath + '.json', JSON.stringify(data, null, 2)).then(() => {
-      log.debug(`saved cache data to ${version}/${name}.json.`);
-    }).catch(e => {
-      log.error(e, `error saving data to cache/${version}/${name}.json`);
-    });
+    fs.writeFileSync(filePath + '.json', JSON.stringify(data, null, 2));
   });
 }
 
