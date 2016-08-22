@@ -36,6 +36,9 @@ var riotData = {
   langData: {}
 }
 
+// Used to keep track of downloading status.
+var downloading = false;
+
 // Client used to gather data from Riot.
 var DDragonClient = restify.createJsonClient({
   url: 'https://ddragon.leagueoflegends.com',
@@ -256,13 +259,16 @@ function clearCache() {
 
 function updateLoop() {
   log.debug('Starting update loop.');
-  getDataFromRiotDDragon();
+  if(!downloading) {
+    getDataFromRiotDDragon();
+  }
   setTimeout(updateLoop, UPDATE_LOOP_TIME);
 }
 
 function getDataFromRiotDDragon() {
   // download the realms JSON for version data.
   log.debug('Downloading realms/na.json');
+  downloading = true;
   DDragonClient.getAsync('/realms/na.json').spread((req, res, obj) => {
     log.debug('Successfully downloaded realms/na.json.');
     var cacheValid = true; // assume we have a good cache and aren't on our initial load.
@@ -403,5 +409,7 @@ function getDataFromRiotDDragon() {
     return o;
   }).catch(e => {
     log.error(e, 'Error when downloading data from DDragon!');
+  }).finally(() => {
+    downloading = false;
   });
 }
