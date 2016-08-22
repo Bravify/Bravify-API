@@ -56,7 +56,37 @@ server.use(restify.bodyParser());
 server.on('after', restifyBunyanLogger());
 
 server.get('/', (req, res, next) => {
-  res.send({app: appName, version: appVersion, message: "Welcome to the Bravify API! For more information, please visit https://github.com/Bravify/Bravify-API."});
+  res.send({app: appName, version: appVersion, message: "Welcome to the Bravify API! For more information, please visit https://github.com/Bravify/Bravify-API.",
+    endpoints: {
+      champion: {
+        'Single-champion full': '/champion/:lang/:name/full',
+        'Single-champion basic': '/champion/:lang/:name',
+        'All-champion full': '/champion/:lang/full',
+        'All-champion basic': '/champion/:lang'
+      },
+      item: {
+        'Single item': '/item/:lang/:id',
+        'All items': '/item/:lang'
+      },
+      summoner: {
+        'Single summoner spell': '/summoner/:lang/:id',
+        'All summoner spells': '/summoner/:lang'
+      },
+      adjective: {
+        'Random adjective': '/adjective/random',
+        'Single adjective': '/adjective/:id',
+        'All adjectives': '/adjective'
+      },
+      language: {
+        'Client language data': '/language/:lang',
+        'All supported languages': '/language'
+      },
+      version: {
+        'Riot DDragon version': '/version/riot',
+        'Bravify-API version': '/version/api'
+      }
+    }
+  });
   return next();
 });
 
@@ -65,12 +95,9 @@ server.get('/version/:tag', (req, res, next) => {
     case 'riot':
       res.send(riotData.version.v || "");
       break;
-    case 'champion':
-      res.send(riotData.champion.version || "");
-      break;
     case 'api':
     default:
-      res.send({name: appName, version: appVersion, author: appAuthor});
+      res.send({name: appName, version: appVersion});
       break;
   }
   return next();
