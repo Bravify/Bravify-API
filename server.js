@@ -57,15 +57,19 @@ server.get('/', (req, res, next) => {
         'Single-champion full': '/champion/:lang/:name/full',
         'Single-champion basic': '/champion/:lang/:name',
         'All-champion full': '/champion/:lang/full',
-        'All-champion basic': '/champion/:lang'
+        'All-champion basic': '/champion/:lang',
+        'Random champion full': '/champion/:lang/random/full',
+        'Random champion basic': '/champion/:lang/random'
       },
       item: {
         'Single item': '/item/:lang/:id',
-        'All items': '/item/:lang'
+        'All items': '/item/:lang',
+        'Random item': '/item/:lang/random'
       },
       summoner: {
         'Single summoner spell': '/summoner/:lang/:id',
-        'All summoner spells': '/summoner/:lang'
+        'All summoner spells': '/summoner/:lang',
+        'Random summoner spell': '/summoner/:lang/random'
       },
       adjective: {
         'Random adjective': '/adjective/random',
