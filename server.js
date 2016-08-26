@@ -98,6 +98,27 @@ server.get('/version/:tag', (req, res, next) => {
   return next();
 });
 
+server.get('/champion/random/full', (req, res, next) => {
+  var lang = 'en_US';
+  if(riotData.champion[lang]) {
+    res.send(riotData.fullChampion[lang][chance.pickone(Object.keys(riotData.fullChampion[lang]))]);
+  } else {
+    res.send({});
+  }
+  return next();
+});
+
+server.get('/champion/:lang/random/full', (req, res, next) => {
+  var lang = req.params.lang || 'en_US';
+  if(riotData.fullChampion[lang]) {
+    res.send(riotData.fullChampion[lang][chance.pickone(Object.keys(riotData.fullChampion[lang]))]);
+  } else {
+    res.send({});
+  }
+  return next();
+});
+
+
 server.get('/champion/:lang/:name/full', (req, res, next) => {
   var lang = req.params.lang || 'en_US';
   if(!req.params.name) {
@@ -118,6 +139,16 @@ server.get('/champion/:lang/full', (req, res, next) => {
   return next();
 });
 
+server.get('/champion/:lang/random', (req, res, next) => {
+  var lang = req.params.lang || 'en_US';
+  if(riotData.champion[lang]) {
+    res.send(riotData.champion[lang][chance.pickone(Object.keys(riotData.champion[lang]))]);
+  } else {
+    res.send({});
+  }
+  return next();
+});
+
 server.get('/champion/:lang/:name', (req, res, next) => {
   var lang = req.params.lang || 'en_US';
   if(!req.params.name) {
@@ -132,6 +163,16 @@ server.get('/champion/:lang/:name', (req, res, next) => {
   return next();
 });
 
+server.get('/champion/random', (req, res, next) => {
+  var lang = 'en_US';
+  if(riotData.champion[lang]) {
+    res.send(riotData.champion[lang][chance.pickone(Object.keys(riotData.champion[lang]))]);
+  } else {
+    res.send({});
+  }
+  return next();
+});
+
 server.get('/champion/:lang', (req, res, next) => {
   var lang = req.params.lang || 'en_US';
   res.send(riotData.champion[lang] || {});
@@ -140,6 +181,16 @@ server.get('/champion/:lang', (req, res, next) => {
 
 server.get('/champion', (req, res, next) => {
   res.send(riotData.champion['en_US'] || {});
+  return next();
+});
+
+server.get('/item/:lang/random', (req, res, next) => {
+  var lang = req.params.lang || 'en_US';
+  if(riotData.item[lang]) {
+    res.send(riotData.item[lang][chance.pickone(Object.keys(riotData.item[lang]))]);
+  } else {
+    res.send({});
+  }
   return next();
 });
 
@@ -157,6 +208,16 @@ server.get('/item/:lang/:id', (req, res, next) => {
   return next();
 });
 
+server.get('/item/random', (req, res, next) => {
+  var lang = 'en_US';
+  if(riotData.item[lang]) {
+    res.send(riotData.item[lang][chance.pickone(Object.keys(riotData.item[lang]))]);
+  } else {
+    res.send({});
+  }
+  return next();
+});
+
 server.get('/item/:lang', (req, res, next) => {
   var lang = req.params.lang || 'en_US';
   res.send(riotData.item[lang] || {});
@@ -165,6 +226,16 @@ server.get('/item/:lang', (req, res, next) => {
 
 server.get('/item', (req, res, next) => {
   res.send(riotData.item['en_US'] || {});
+  return next();
+});
+
+server.get('/summoner/:lang/random', (req, res, next) => {
+  var lang = req.params.lang || 'en_US';
+  if(riotData.summoner[lang]) {
+    res.send(riotData.summoner[lang][chance.pickone(Object.keys(riotData.summoner[lang]))]);
+  } else {
+    res.send({});
+  }
   return next();
 });
 
@@ -178,6 +249,16 @@ server.get('/summoner/:lang/:id', (req, res, next) => {
     } else {
       res.send({});
     }
+  }
+  return next();
+});
+
+server.get('/summoner/random', (req, res, next) => {
+  var lang = 'en_US';
+  if(riotData.summoner[lang]) {
+    res.send(riotData.summoner[lang][chance.pickone(Object.keys(riotData.summoner[lang]))]);
+  } else {
+    res.send({});
   }
   return next();
 });
