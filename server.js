@@ -5,6 +5,7 @@ var chance = new (require('chance'))();
 var restifyBunyanLogger = require('restify-bunyan-logger');
 var semver = require('semver');
 var DataLoader = require('./lib/DataLoader');
+var SummonerSpells = require('./lib/SummonerSpells');
 
 // our variables
 var appName = require('./package.json').name;
@@ -25,7 +26,7 @@ var riotData = {
   champion: {},
   fullChampion: {},
   item: {},
-  summoner: {},
+  summoner: null,
   version: {},
   language: [],
   langData: {}
@@ -233,12 +234,44 @@ server.get('/item', (req, res, next) => {
   return next();
 });
 
-server.get('/summoner/:lang/random', (req, res, next) => {
-  var lang = req.params.lang || 'en_US';
-  if(riotData.summoner[lang]) {
-    res.send(riotData.summoner[lang][chance.pickone(Object.keys(riotData.summoner[lang]))]);
+server.get('/summoner/:lang/random/:num', (req, res, next) => {
+  if(!riotData.summoner) {
+    res.send({}); // TODO: return error indicating to try again later.
   } else {
-    res.send({});
+    var modes = ['CLASSIC']; //TODO: allow user-selectable modes.
+    res.send(riotData.summoner.getRandom({
+      count: Math.min(req.params.num, 200),
+      lang: req.params.lang,
+      modes: modes
+    }));
+  }
+  return next();
+});
+
+server.get('/summoner/random/:num', (req, res, next) => {
+  if(!riotData.summoner) {
+    res.send({}); // TODO: return error indicating to try again later.
+  } else {
+    var modes = ['CLASSIC']; //TODO: allow user-selectable modes.
+    res.send(riotData.summoner.getRandom({
+      count: Math.min(req.params.num, 200),
+      lang: 'en_US',
+      modes: modes
+    }));
+  }
+  return next();
+});
+
+server.get('/summoner/:lang/random', (req, res, next) => {
+  if(!riotData.summoner) {
+    res.send({}); // TODO: return error indicating to try again later.
+  } else {
+    var modes = ['CLASSIC']; //TODO: allow user-selectable modes.
+    res.send(riotData.summoner.getRandom({
+      count: 1,
+      lang: req.params.lang,
+      modes: modes
+    }));
   }
   return next();
 });
@@ -258,11 +291,15 @@ server.get('/summoner/:lang/:id', (req, res, next) => {
 });
 
 server.get('/summoner/random', (req, res, next) => {
-  var lang = 'en_US';
-  if(riotData.summoner[lang]) {
-    res.send(riotData.summoner[lang][chance.pickone(Object.keys(riotData.summoner[lang]))]);
+  if(!riotData.summoner) {
+    res.send({}); // TODO: return error indicating to try again later.
   } else {
-    res.send({});
+    var modes = ['CLASSIC']; //TODO: allow user-selectable modes.
+    res.send(riotData.summoner.getRandom({
+      count: 1,
+      lang: 'en_US',
+      modes: modes
+    }));
   }
   return next();
 });
@@ -354,7 +391,7 @@ function updateLoop() {
     } else {return false;}
   }).then(d => {
     if(d) {
-      riotData.summoner = d.data;
+      riotData.summoner = new SummonerSpells(d.data);
       log.debug(`Loading champion data.`);
       return dLoader.getData('champion', d.version, d.lang).then(data => {
         log.debug(`Champion data loaded.`);
