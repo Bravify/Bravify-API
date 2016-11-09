@@ -97,6 +97,19 @@ server.get('/version/:tag', (req, res, next) => {
       break;
     case 'api':
     default:
+      res.send(appVersion || "");
+      break;
+  }
+  return next();
+});
+
+server.get('/version/:tag/full', (req, res, next) => {
+  switch(req.params.tag) {
+    case 'riot':
+      res.send(riotData.version || {});
+      break;
+    case 'api':
+    default:
       res.send({name: appName, version: appVersion});
       break;
   }
@@ -351,6 +364,7 @@ function updateLoop() {
   var arrEq = require('./lib/Helpers').arraysEqual;
   log.info('Starting update loop.');
   dLoader.getRealmAndLangListData('na').then(d => {
+    riotData.version = d.version;
     if(!riotData.language.length || !arrEq(riotData.language, d.lang)) {
       riotData.language = d.lang;
       log.debug(`Loading language data.`);
