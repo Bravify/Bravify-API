@@ -247,43 +247,40 @@ server.get('/item', (req, res, next) => {
   return next();
 });
 
-server.get('/summoner/:lang/random/:num', (req, res, next) => {
+server.get('/summoner/:lang/:mode/random/:num', (req, res, next) => {
   if(!riotData.summoner) {
     res.send({}); // TODO: return error indicating to try again later.
   } else {
-    var modes = ['CLASSIC']; //TODO: allow user-selectable modes.
     res.send(riotData.summoner.getRandom({
       count: Math.min(req.params.num, 200),
       lang: req.params.lang,
-      modes: modes
+      mode: req.params.mode
     }));
   }
   return next();
 });
 
-server.get('/summoner/random/:num', (req, res, next) => {
+server.get('/summoner/:mode/random/:num', (req, res, next) => {
   if(!riotData.summoner) {
     res.send({}); // TODO: return error indicating to try again later.
   } else {
-    var modes = ['CLASSIC']; //TODO: allow user-selectable modes.
     res.send(riotData.summoner.getRandom({
       count: Math.min(req.params.num, 200),
       lang: 'en_US',
-      modes: modes
+      mode: req.params.mode
     }));
   }
   return next();
 });
 
-server.get('/summoner/:lang/random', (req, res, next) => {
+server.get('/summoner/:lang/:mode/random', (req, res, next) => {
   if(!riotData.summoner) {
     res.send({}); // TODO: return error indicating to try again later.
   } else {
-    var modes = ['CLASSIC']; //TODO: allow user-selectable modes.
     res.send(riotData.summoner.getRandom({
       count: 1,
       lang: req.params.lang,
-      modes: modes
+      mode: req.params.mode
     }));
   }
   return next();
@@ -303,15 +300,14 @@ server.get('/summoner/:lang/:id', (req, res, next) => {
   return next();
 });
 
-server.get('/summoner/random', (req, res, next) => {
+server.get('/summoner/:mode/random', (req, res, next) => {
   if(!riotData.summoner) {
     res.send({}); // TODO: return error indicating to try again later.
   } else {
-    var modes = ['CLASSIC']; //TODO: allow user-selectable modes.
     res.send(riotData.summoner.getRandom({
       count: 1,
       lang: 'en_US',
-      modes: modes
+      mode: req.params.mode
     }));
   }
   return next();
