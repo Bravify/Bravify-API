@@ -353,7 +353,9 @@ server.get('/language', (req, res, next) => {
 
 server.listen(8080, function () {
   log.info('%s listening at %s', server.name, server.url);
-  updateLoop(); // kick off the update loop.
+  dLoader.on('ready', () => {
+    updateLoop(); // kick off the update loop.
+  });
 });
 
 function updateLoop() {
